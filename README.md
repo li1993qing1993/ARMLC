@@ -1,2 +1,2 @@
 # ARMLC
-Amazon Robotic Machine Learning Competition
+2017ARMLC
