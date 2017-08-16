@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Build the model. Note that we need to make sure the TensorFlow is ready to
 # use before this as this command will not build TensorFlow.
-cd /home/qingli/tensorflow_repo/models/inception
+cd $HOME/ARMLC/Classifier/model/inception/
 bazel build //inception:flowers_eval
 
 # Directory where we saved the fine-tuned checkpoint and events files.

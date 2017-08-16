@@ -31,14 +31,14 @@ class FlowersData(Dataset):
 
   def num_classes(self):
     """Returns the number of classes in the data set."""
-    return 254
+    return 34049
 
   def num_examples_per_epoch(self):
     """Returns the number of examples in the data subset."""
     if self.subset == 'train':
-      return 22485
+      return 1977287
     if self.subset == 'validation':
-      return 5515
+      return 489061
 
   def download_message(self):
     """Instruction to download and extract the tarball from Flowers website."""

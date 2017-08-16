@@ -20,8 +20,8 @@ def transform_image(data_dir):
             im = Image.open(f_path)
             im_size = im.size
             wh_ratio = float(im_size[0]) / im_size[1]
-            if im_size[1] > 500:
-                im_tmp = im.resize((int(wh_ratio * 500), 500))
+            if im_size[1] > 299:
+                im_tmp = im.resize((int(wh_ratio * 299), 299))
                 im_blur = im_tmp.filter(ImageFilter.BLUR)
                 #im_blur = im_blur.resize((im_size[0], im_size[1]))
                 im_blur.save(f_path[:f_prefix_idx] + '_blur.jpg')
@@ -94,3 +94,33 @@ def transform_image(data_dir):
         filenames = os.listdir(label_dir)
         if len(filenames) < 50:
             print('Label %s does not have enough images. It only has %d images' %(label, len(filenames)))
+
+
+def resize_all(data_dir, width, height):
+    file_list = os.listdir(data_dir)
+    for f in file_list:
+        if os.path.isdir(os.path.join(data_dir, f)):
+            print('resize images for label %s' % f)
+            resize_all(os.path.join(data_dir, f), width, height)
+        elif f.endswith('.jpg') or f.endswith('.jepg') or f.endswith('.png'):
+            im = Image.open(os.path.join(data_dir, f))
+            im_r = im.resize((width, height))
+            im_r.save(os.path.join(data_dir, f))
+
+def resize(data_dir, width, height):
+    file_list = os.listdir(data_dir)
+    print(data_dir)
+    for f in file_list:
+        print(f)
+        if os.path.isdir(os.path.join(data_dir, f)):
+            print('resize images for label %s' % f)
+            resize_all(os.path.join(data_dir, f), width, height)
+        elif f.endswith('.jpg') or f.endswith('.jepg') or f.endswith('.png'):
+            print('resizing...')
+            im = Image.open(os.path.join(data_dir, f))
+            im_size = im.size
+            if im_size[0] > 800 or im_size[1] > 800:
+                im_r = im.resize((width, height))
+                #os.remove(os.path.join(data_dir, f))
+                im_r.save(os.path.join(data_dir, f))
+

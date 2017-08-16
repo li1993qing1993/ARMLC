@@ -1,13 +1,15 @@
 import sys
 import os, random
 import shutil
+import argparse
 import image_transformation
 
-data_dir = '/media/qingli/C8EA71A3EA718E86/ARMLC/tf_files/subTrainingSet'
-
+data_dir = '/media/qingli/C8EA71A3EA718E86/ARMLC/dataset/image'
+data_dir_parent = '/media/qingli/C8EA71A3EA718E86/ARMLC/dataset'
 
 def format_dataset(data_dir):
     print('Determining list of input files and labels from %s.' % data_dir)
+
     filenames = os.listdir(data_dir)
     filenames_labeled = [(data_dir + '/' + f[:10]) for f in filenames]
     dir_count = 0
@@ -60,7 +62,9 @@ def split_data(data_dir, validation_percentage, output_val_dir, output_train_dir
         os.mkdir(output_val_dir, 0755)
     print('splitting data to training set and validation set.')
     labels = os.listdir(data_dir)
+    c = 0
     for l in labels:
+        print('split data for label %s' % l)
         label_dir = os.path.join(data_dir, l)
         image_list = os.listdir(label_dir)
         image_filenames = [os.path.join(label_dir, im) for im in image_list]
@@ -79,6 +83,7 @@ def split_data(data_dir, validation_percentage, output_val_dir, output_train_dir
         if os.path.exists(os.path.join(output_train_dir, l)):
             shutil.rmtree(os.path.join(output_train_dir, l))
         shutil.copytree(label_dir, os.path.join(output_train_dir, l))
+        shutil.rmtree(label_dir)
 
 """
 Combine the training dataset and validation dataset. This function is the revert funtion of split_data function
@@ -88,7 +93,7 @@ def combine_data(train_dir, val_dir, output_dir):
         os.mkdir(output_dir)
     labels = os.listdir(train_dir)
     for l in labels:
-        label_dir = os.path.join(data_dir, l)
+        label_dir = os.path.join(train_dir, l)
         image_list = os.listdir(label_dir)
         image_filenames = [os.path.join(label_dir, im) for im in image_list]
         for image in image_filenames:
@@ -101,7 +106,7 @@ def combine_data(train_dir, val_dir, output_dir):
                 os.rename(image, dest_file)
     labels = os.listdir(val_dir)
     for l in labels:
-        label_dir = os.path.join(data_dir, l)
+        label_dir = os.path.join(val_dir, l)
         image_list = os.listdir(label_dir)
         image_filenames = [os.path.join(label_dir, im) for im in image_list]
         for image in image_filenames:
@@ -126,10 +131,26 @@ def create_label_file(data_dir, label_file_path):
             f.write(label)
             f.write('\n')
 
+"""
+Don't use this function. Too slow, use the following command instead.
+find . -type f | sed 's/.*\.//' | sort | uniq -c
+"""
+def count_jpg(jpg_file):
+    count = 0
+    if os.path.isdir(jpg_file):
+        folder_list = os.listdir(jpg_file)
+        for f in folder_list:
+            count += count_jpg(os.path.join(jpg_file, f))
+        return count
+    elif jpg_file.endswith('.jpg'):
+        return 1
 
 
-format_dataset(data_dir)
-image_transformation.transform_image(data_dir)
-split_data(data_dir, 0.2, '/media/qingli/C8EA71A3EA718E86/ARMLC/tf_files/subTrainingSet_val', '/media/qingli/C8EA71A3EA718E86/ARMLC/tf_files/subTrainingSet_train')
-#combine_data('/media/qingli/C8EA71A3EA718E86/ARMLC/tf_files/subTrainingSet_val', '/media/qingli/C8EA71A3EA718E86/ARMLC/tf_files/subTrainingSet_train', '/media/qingli/C8EA71A3EA718E86/ARMLC/tf_files/subTrainingSet')
-create_label_file('/media/qingli/C8EA71A3EA718E86/ARMLC/tf_files/subTrainingSet_train', '/media/qingli/C8EA71A3EA718E86/ARMLC/tf_files/label_file.txt')
+#format_dataset(data_dir)
+#image_transformation.transform_image(data_dir)
+#split_data(data_dir, 0.2, data_dir_parent + '/subTrainingSet_val', data_dir_parent + '/subTrainingSet_train')
+#combine_data('/media/qingli/C8EA71A3EA718E86/ARMLC/tf_files/subTrainingSet_val', '/media/qingli/C8EA71A3EA718E86/ARMLC/tf_files/subTrainingSet_train', '/media/qingli/C8EA71A3EA718E86/ARMLC/tf_files/subTrainingSet_2')
+#create_label_file(data_dir_parent + '/subTrainingSet_train', data_dir_parent + '/label_file.txt')
+#image_transformation.resize_all(data_dir_parent + '/subTrainingSet_val', 299, 299)
+#image_transformation.resize_all(data_dir_parent + '/subTrainingSet_train', 299, 299)
+print(count_jpg(data_dir_parent + '/subTrainingSet_train'))

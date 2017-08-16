@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 INCEPTION_MODEL_DIR=$HOME/inception-v3-model
 if [ ! -d "$INCEPTION_MODEL_DIR" ]; then
     mkdir -p ${INCEPTION_MODEL_DIR}
@@ -19,7 +20,7 @@ bazel build //inception:flowers_train
 MODEL_PATH="${INCEPTION_MODEL_DIR}/inception-v3/model.ckpt-157585"
 
 # Directory where the flowers data resides.
-DATA_DIR=/media/qingli/C8EA71A3EA718E86/ARMLC/my-custom-data/
+DATA_DIR=/media/qingli/C8EA71A3EA718E86/ARMLC/dataset/my-custom-data/
 
 # Directory where to save the checkpoint and events files.
 TRAIN_DIR=/media/qingli/C8EA71A3EA718E86/ARMLC/train_data
@@ -29,8 +30,8 @@ TRAIN_DIR=/media/qingli/C8EA71A3EA718E86/ARMLC/train_data
 bazel-bin/inception/flowers_train \
   --train_dir="${TRAIN_DIR}" \
   --data_dir="${DATA_DIR}" \
-  --pretrained_model_checkpoint_path="${MODEL_PATH}" \
-  --fine_tune=True \
-  --initial_learning_rate=0.002 \
+  --pretrained_model_checkpoint_path="/media/qingli/C8EA71A3EA718E86/ARMLC/train_data_280000/model.ckpt-280000" \
+  --fine_tune=False \
+  --initial_learning_rate=0.005 \
   --input_queue_memory_factor=1 \
-  --batch_size=12
+  --batch_size=5

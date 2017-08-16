@@ -318,11 +318,29 @@ def train(dataset):
     sess.run(init)
 
     if FLAGS.pretrained_model_checkpoint_path:
-      assert tf.gfile.Exists(FLAGS.pretrained_model_checkpoint_path)
+      #assert tf.gfile.Exists(FLAGS.pretrained_model_checkpoint_path)
       variables_to_restore = tf.get_collection(
           slim.variables.VARIABLES_TO_RESTORE)
-      restorer = tf.train.Saver(variables_to_restore)
-      restorer.restore(sess, FLAGS.pretrained_model_checkpoint_path)
+      #restorer = tf.train.Saver(variables_to_restore)
+      #restorer.restore(sess, FLAGS.pretrained_model_checkpoint_path)
+      #saver = tf.train.import_meta_graph('/media/qingli/C8EA71A3EA718E86/ARMLC/train_data_280000/model.ckpt-280000.meta')
+      saver.restore(sess, FLAGS.pretrained_model_checkpoint_path)
+      """
+      ckpt = tf.train.get_checkpoint_state(FLAGS.pretrained_model_checkpoint_path)
+      if ckpt and ckpt.model_checkpoint_path:
+        if os.path.isabs(ckpt.model_checkpoint_path):
+            # Restores from checkpoint with absolute path.
+            saver.restore(sess, ckpt.model_checkpoint_path)
+        else:
+            # Restores from checkpoint with relative path.
+            saver.restore(sess, os.path.join(FLAGS.pretrained_model_checkpoint_path,
+                                             ckpt.model_checkpoint_path))
+
+        # Assuming model_checkpoint_path looks something like:
+        #   /my-favorite-path/imagenet_train/model.ckpt-0,
+        # extract global_step from it.
+        global_step = ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1]
+        """
       print('%s: Pre-trained model restored from %s' %
             (datetime.now(), FLAGS.pretrained_model_checkpoint_path))
 
@@ -352,6 +370,6 @@ def train(dataset):
         summary_writer.add_summary(summary_str, step)
 
       # Save the model checkpoint periodically.
-      if step % 1000 == 0 or (step + 1) == FLAGS.max_steps:
+      if step % 5000 == 0 or (step + 1) == FLAGS.max_steps:
         checkpoint_path = os.path.join(FLAGS.train_dir, 'model.ckpt')
         saver.save(sess, checkpoint_path, global_step=step)
